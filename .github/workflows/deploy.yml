@@ -8,8 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    # Si la rama es 'main', despliega a 'prod'. Podrías usar otra rama para 'dev'.
     env:
-      STAGE: DEV
+      STAGE: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+
     steps:
       # 1. Checkout
       - uses: actions/checkout@v4
@@ -25,8 +28,14 @@ jobs:
       - name: Compilar Java con Maven
         run: mvn clean package -DskipTests
 
+      # 4. Configurar Node.js
+      - name: Configurar Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
       # 6. Despliegue con Serverless Framework
       - name: Desplegar Serverless Stack
         run: |
-          npm install -g serverless
+          npm install -g serverless # Instalar el framework globalmente
           serverless deploy --stage ${STAGE}
