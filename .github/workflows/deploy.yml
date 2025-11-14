@@ -3,7 +3,7 @@ name: Despliegue de API Serverless de Pedidos
 on:
   push:
     branches:
-      - main
+      - fead/crud
 
 jobs:
   deploy:
@@ -37,4 +37,4 @@ jobs:
       - name: Desplegar Serverless Stack
         run: |
           npm install -g serverless
-          serverless deploy --stage ${STAGE}
+          serverless deploy --stage dev
