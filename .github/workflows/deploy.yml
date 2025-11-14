@@ -38,14 +38,8 @@ jobs:
       - name: Instalar Serverless Framework
         run: npm install -g serverless@4
 
-      - name: Configurar License Key para Serverless
-        run: |
-          echo "SERVERLESS_LICENSE=${{ secrets.SERVERLESS_LICENSE }}" >> $GITHUB_ENV
-
-      - name: Verificar el valor del License Key
-        run: |
-            echo "License Key: $SERVERLESS_LICENSE"
-
       # 6. Despliegue con Serverless Framework
       - name: Desplegar Serverless Stack
+        env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_LICENSE }}
         run: serverless deploy --stage dev
