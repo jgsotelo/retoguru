@@ -18,6 +18,7 @@ public class OrderHandler {
     private final DynamoDbAsyncTable<Order> orderTable;
 
     public Mono<ServerResponse> getOrder(ServerRequest request) {
+
         String id = request.pathVariable("id");
         Key key = Key.builder().partitionValue(id).build();
 
@@ -29,7 +30,6 @@ public class OrderHandler {
     }
 
     public Mono<ServerResponse> getAllOrders() {
-        // NOTA: scan() es costoso y lento para tablas grandes. Usar Query o GSI para producción.
         return ServerResponse.ok().bodyValue(List.of(Order.builder()
                         .orderId("P0001")
                         .customerId("CP122")
