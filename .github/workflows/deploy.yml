@@ -40,7 +40,7 @@ jobs:
 
       - name: Configurar License Key para Serverless
         run: |
-          echo "export SERVERLESS_LICENSE=${{ secrets.SERVERLESS_LICENSE }}" >> $GITHUB_ENV
+          echo "SERVERLESS_LICENSE=${{ secrets.SERVERLESS_LICENSE }}" >> $GITHUB_ENV
 
       - name: Verificar el valor del License Key
         run: |
