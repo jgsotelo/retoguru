@@ -2,10 +2,10 @@ spring:
   application:
     name: reto
   main:
-    web-application-type: ${SPRING_MAIN_WEB_APPLICATION_TYPE}
+    web-application-type: ${SPRING_MAIN_WEB_APPLICATION_TYPE:REACTIVE}
   properties:
-    db_table: ${DYNAMODB_TABLE}
-    db_region: ${DYNAMODB_REGION}
+    db_table: ${DYNAMODB_TABLE:order}
+    db_region: ${DYNAMODB_REGION:us-east-1}
 
 
 aws:
