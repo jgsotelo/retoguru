@@ -1,0 +1,79 @@
+service: orders-api
+
+# Configuración General del Framework
+frameworkVersion: '3'
+configValidationMode: error
+
+# Configuración del Proveedor (AWS)
+provider:
+  name: aws
+  region: us-east-1
+  runtime: java17
+
+  # CRÍTICO para Java/Spring
+  snapStart: true
+
+  memorySize: 1536
+  timeout: 29 # Tiempo de ejecucion
+
+  # Variables de Entorno
+  environment:
+    DYNAMODB_TABLE: ${self:custom.tableName}
+    DYNAMODB_REGION: ${self:provider.region}
+    # Deshabilita el servidor web de Spring Boot, esencial para Lambda
+    SPRING_MAIN_WEB_APPLICATION_TYPE: NONE
+
+  # Permisos IAM para la Función (Role de ejecución)
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            # CRUD en DynamoDB
+            - "dynamodb:PutItem"
+            - "dynamodb:GetItem"
+            - "dynamodb:UpdateItem"
+            - "dynamodb:DeleteItem"
+            - "dynamodb:Scan"
+          # Permisos limitados (Principio de Mínimo Privilegio)
+          Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:custom.tableName}"
+        - Effect: "Allow"
+          Action:
+            - "logs:CreateLogGroup"
+            - "logs:CreateLogStream"
+            - "logs:PutLogEvents"
+          Resource: "arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*:*"
+
+package:
+  artifact: target/reto-0.0.1-SNAPSHOT.jar
+
+# Definición de Funciones
+functions:
+  api:
+    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker
+    events:
+      - httpApi:
+          method: 'ANY'
+          path: /orders
+      - httpApi:
+          method: 'ANY'
+          path: /orders/{proxy+}
+
+custom:
+  tableName: 'orders-table-dev'
+
+# Recursos de AWS (CloudFormation puro)
+resources:
+  Resources:
+    OrdersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: 'orderId'
+            AttributeType: 'S'
+        KeySchema:
+          - AttributeName: 'orderId'
+            KeyType: 'HASH'
+        BillingMode: 'PAY_PER_REQUEST'
