@@ -3,7 +3,7 @@ name: Despliegue de API Serverless de Pedidos
 on:
   push:
     branches:
-      - /fead/crud
+      - feat/crud
 
 jobs:
   deploy:
