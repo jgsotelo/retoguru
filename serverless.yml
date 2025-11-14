@@ -8,7 +8,7 @@ configValidationMode: error
 provider:
   name: aws
   region: us-east-1
-  runtime: java11
+  runtime: provided.al2
 
   memorySize: 1536
   timeout: 29 # Tiempo de ejecucion
@@ -18,7 +18,7 @@ provider:
     DYNAMODB_TABLE: ${self:custom.tableName}
     DYNAMODB_REGION: ${self:provider.region}
     # Deshabilita el servidor web de Spring Boot, esencial para Lambda
-    SPRING_MAIN_WEB_APPLICATION_TYPE: NONE
+    SPRING_MAIN_WEB_APPLICATION_TYPE: REACTIVE
 
   # Permisos IAM para la Función (Role de ejecución)
   iam:
@@ -48,6 +48,9 @@ package:
 functions:
   api:
     handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker
+    image:
+      name: orders-api  # El nombre de la imagen Docker
+      build: .  # Usamos el Dockerfile en el directorio actual para construir la imagen
     events:
       - httpApi:
           method: 'ANY'
