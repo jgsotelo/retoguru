@@ -36,5 +36,5 @@ jobs:
       # 6. Despliegue con Serverless Framework
       - name: Desplegar Serverless Stack
         run: |
-          npm install -g serverless # Instalar el framework globalmente
+          npm install -g serverless
           serverless deploy --stage ${STAGE}
