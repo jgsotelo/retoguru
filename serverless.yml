@@ -1,14 +1,15 @@
 service: orders-api
 
 # Configuración General del Framework
-frameworkVersion: '3.0.0'
+frameworkVersion: '4'
 configValidationMode: error
 
 # Configuración del Proveedor (AWS)
 provider:
   name: aws
   region: us-east-1
-  runtime: provided.al2
+  runtime: java17
+  snapStart: true
 
   memorySize: 1536
   timeout: 29 # Tiempo de ejecucion
@@ -47,9 +48,7 @@ package:
 # Definición de Funciones
 functions:
   api:
-    image:
-      name: orders-api  # El nombre de la imagen Docker
-      build: .  # Usamos el Dockerfile en el directorio actual para construir la imagen
+    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker
     events:
       - httpApi:
           method: 'ANY'
