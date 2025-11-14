@@ -1,7 +1,7 @@
 service: orders-api
 
 # Configuración General del Framework
-frameworkVersion: '3'
+frameworkVersion: '3.0.0'
 configValidationMode: error
 
 # Configuración del Proveedor (AWS)
