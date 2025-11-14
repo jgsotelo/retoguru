@@ -38,6 +38,10 @@ jobs:
       - name: Instalar Serverless Framework
         run: npm install -g serverless@4
 
+      - name: Configurar License Key para Serverless
+        run: |
+            export SERVERLESS_LICENSE=${{ secrets.SERVERLESS_LICENSE }}
+
       # 6. Despliegue con Serverless Framework
       - name: Desplegar Serverless Stack
         run: serverless deploy --stage dev
