@@ -27,18 +27,17 @@ jobs:
       - name: Compilar Java con Maven
         run: mvn clean package -DskipTests
 
-      # 4. Configurar Node.js
-      - name: Configurar Node.js 18
-        uses: actions/setup-node@v3
+      # 4. Configurar las credenciales de AWS (para poder hacer deploy)
+      - name: Configurar credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          node-version: '18'
+          aws-access-key-id: 'key-id'  # Coloca tus credenciales en GitHub Secrets
+          aws-secret-access-key: 'key-2'
+          aws-region: us-east-1
 
-      # 5. Instalar dependencias de Node.js
-      - name: Instalar dependencias de Node.js
-        run: npm install
+      - name: Instalar Serverless Framework
+        run: npm install -g serverless@2
 
       # 6. Despliegue con Serverless Framework
       - name: Desplegar Serverless Stack
-        run: |
-          npm install -g serverless@2
-          serverless deploy --stage dev
+        run: serverless deploy --stage dev
