@@ -9,9 +9,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Si la rama es 'main', despliega a 'prod'. Podrías usar otra rama para 'dev'.
     env:
-      STAGE: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+      STAGE: dev
 
     steps:
       # 1. Checkout
