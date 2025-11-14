@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
+import java.util.List;
+
 @Component
 @AllArgsConstructor
 public class OrderHandler {
@@ -28,6 +30,13 @@ public class OrderHandler {
 
     public Mono<ServerResponse> getAllOrders() {
         // NOTA: scan() es costoso y lento para tablas grandes. Usar Query o GSI para producción.
-        return ServerResponse.ok().body(orderTable.scan().items(), Order.class);
+        return ServerResponse.ok().bodyValue(List.of(Order.builder()
+                        .orderId("P0001")
+                        .customerId("CP122")
+                .build(),
+                Order.builder()
+                        .orderId("P0002")
+                        .customerId("CP666")
+                        .build()));
     }
 }
