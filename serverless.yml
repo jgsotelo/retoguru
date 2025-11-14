@@ -47,7 +47,6 @@ package:
 # Definición de Funciones
 functions:
   api:
-    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker
     image:
       name: orders-api  # El nombre de la imagen Docker
       build: .  # Usamos el Dockerfile en el directorio actual para construir la imagen
