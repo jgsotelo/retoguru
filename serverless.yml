@@ -15,7 +15,7 @@ provider:
 
   # Variables de Entorno
   environment:
-    MAIN_CLASS: com.guru.reto.RetoApplication
+    MAIN_CLASS: BOOT-INF/classes/com.guru.reto.RetoApplication
     DYNAMODB_TABLE: ${self:custom.tableName}
     DYNAMODB_REGION: ${self:provider.region}
     # Deshabilita el servidor web de Spring Boot, esencial para Lambda
