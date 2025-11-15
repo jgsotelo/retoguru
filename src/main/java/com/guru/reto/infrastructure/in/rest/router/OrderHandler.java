@@ -1,42 +1,51 @@
 package com.guru.reto.infrastructure.in.rest.router;
 
-import com.guru.reto.domain.Order;
+import com.guru.reto.application.in.port.OrderMutationPort;
+import com.guru.reto.application.in.port.OrderSearchPort;
+import com.guru.reto.infrastructure.in.rest.dto.OrderRegisterReq;
+import com.guru.reto.infrastructure.in.rest.dto.OrderUpdateReq;
+import com.guru.reto.infrastructure.util.Constants;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
 
-import java.util.List;
-
+@Slf4j
 @Component
 @AllArgsConstructor
 public class OrderHandler {
 
-    private final DynamoDbAsyncTable<Order> orderTable;
+    private final OrderSearchPort orderSearchPort;
+    private final OrderMutationPort orderMutationPort;
 
     public Mono<ServerResponse> getOrder(ServerRequest request) {
-
-        String id = request.pathVariable("id");
-        Key key = Key.builder().partitionValue(id).build();
-
-        Mono<Order> itemMono = Mono.fromCompletionStage(orderTable.getItem(key));
-
-        return itemMono
+        return Mono.just(request)
+                .map(req -> req.pathVariable(Constants.PARAM_ID))
+                .flatMap(orderSearchPort::findId)
                 .flatMap(order -> ServerResponse.ok().bodyValue(order))
-                .switchIfEmpty(ServerResponse.notFound().build());
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .doOnSuccess(res -> log.info("Success Get Order for id"));
     }
 
     public Mono<ServerResponse> getAllOrders() {
-        return ServerResponse.ok().bodyValue(List.of(Order.builder()
-                        .orderId("P0001")
-                        .customerId("CP122")
-                .build(),
-                Order.builder()
-                        .orderId("P0002")
-                        .customerId("CP666")
-                        .build()));
+        return orderSearchPort.findAll()
+                .flatMap(orders -> ServerResponse.ok().bodyValue(orders))
+                .doOnSuccess(res -> log.info("Success All Orders"));
+    }
+
+    public Mono<ServerResponse> registerOrder(ServerRequest request) {
+        return request.bodyToMono(OrderRegisterReq.class)
+                .flatMap(orderMutationPort::registerOrder)
+                .flatMap(order -> ServerResponse.status(201).bodyValue(order))
+                .doOnSuccess(res -> log.info("Success Register Order"));
+    }
+
+    public Mono<ServerResponse> updateOrder(ServerRequest request) {
+        return request.bodyToMono(OrderUpdateReq.class)
+                .flatMap(orderMutationPort::updateOrder)
+                .flatMap(order -> ServerResponse.accepted().bodyValue(order))
+                .doOnSuccess(res -> log.info("Success Update Order"));
     }
 }

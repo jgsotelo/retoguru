@@ -16,7 +16,7 @@ public class DynamoDbConfig {
     @Value("${spring.properties.db_table}")
     private String table;
 
-    @Value("${spring.properties.db_table}")
+    @Value("${spring.properties.db_region}")
     private String region;
 
 

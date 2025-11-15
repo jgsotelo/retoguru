@@ -4,13 +4,5 @@ spring:
   main:
     web-application-type: ${SPRING_MAIN_WEB_APPLICATION_TYPE:REACTIVE}
   properties:
-    db_table: ${DYNAMODB_TABLE:order}
+    db_table: ${DYNAMODB_TABLE:orders-table-dev}
     db_region: ${DYNAMODB_REGION:us-east-1}
-
-
-aws:
-  dynamodb.endpoint-override: http://localhost:8000
-  # Credenciales "dummy" para el cliente local (no las valida)
-  access-key-id: fakeAccessKey
-  secret-access-key: fakeSecretKey
-
