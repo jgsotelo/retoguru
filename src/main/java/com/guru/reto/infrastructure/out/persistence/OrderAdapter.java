@@ -14,6 +14,7 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbAsyncTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
 
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -60,6 +61,11 @@ public class OrderAdapter implements OrderPort {
                         .item(orderCurrent.toBuilder()
                                 .customerId(StringUtils.isNotEmpty(order.getCustomerId()) ? order.getCustomerId() : orderCurrent.getCustomerId())
                                 .address(StringUtils.isNotEmpty(order.getAddress()) ? order.getAddress() : orderCurrent.getAddress())
+                                .orderDate(orderCurrent.getOrderDate())
+                                .orderUpdate(Instant.now())
+                                .version(orderCurrent.getVersion())
+                                .status(orderCurrent.getStatus())
+                                .items(orderCurrent.getItems())
                                 .build())
                         .build())
                 .flatMap(body -> Mono.fromCompletionStage(orderTable.updateItem(body))

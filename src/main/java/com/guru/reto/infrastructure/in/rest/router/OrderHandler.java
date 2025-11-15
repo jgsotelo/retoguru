@@ -13,9 +13,7 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -57,19 +55,16 @@ public class OrderHandler {
                 .doOnSuccess(res -> log.info("Success Update Order"));
     }
 
-    // [NUEVO] Método auxiliar para manejar la respuesta de error 400
     private Mono<ServerResponse> handleValidationException(WebExchangeBindException e) {
-
-        // Convertimos los errores de binding a nuestra estructura ErrorResponse
         List<ErrorResponse> errors = e.getBindingResult().getAllErrors().stream()
                 .map(error -> ErrorResponse.builder()
-                        .field(error.getObjectName()) // O usa ((FieldError) error).getField()
+                        .field(error.getObjectName())
                         .message(error.getDefaultMessage())
                         .build())
                 .toList();
 
         return ServerResponse.badRequest()
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                .bodyValue(errors); // Devuelve la lista de errores como JSON
+                .bodyValue(errors);
     }
 }

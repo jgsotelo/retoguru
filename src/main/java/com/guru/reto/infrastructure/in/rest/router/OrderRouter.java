@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class OrderRouter {
 
     private static final String PATH_ORDER = "/orders";
-    private static final String PATH_ORDER_KEY = "/orders";
+    private static final String PATH_ORDER_KEY = "/orders/{id}";
 
     @Bean
     public RouterFunction<ServerResponse> route(OrderHandler orderHandler) {

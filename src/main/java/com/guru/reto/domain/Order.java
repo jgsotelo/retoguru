@@ -73,6 +73,7 @@ public class Order implements Serializable {
 
     public static Order fromUpdate(final OrderUpdateReq req) {
         return Order.builder()
+                .orderId(req.id())
                 .customerId(req.customer())
                 .address(req.address())
                 .build();

@@ -16,7 +16,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Override
     public Validator getValidator() {
-        // Le dice a WebFlux que use este bean para la validación
         return localValidatorFactoryBean();
     }
 }
