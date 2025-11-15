@@ -5,12 +5,17 @@ import com.guru.reto.application.in.port.OrderSearchPort;
 import com.guru.reto.infrastructure.in.rest.dto.OrderRegisterReq;
 import com.guru.reto.infrastructure.in.rest.dto.OrderUpdateReq;
 import com.guru.reto.infrastructure.util.Constants;
+import com.guru.reto.infrastructure.util.ErrorResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -36,9 +41,11 @@ public class OrderHandler {
     }
 
     public Mono<ServerResponse> registerOrder(ServerRequest request) {
-        return request.bodyToMono(OrderRegisterReq.class)
+        Mono<OrderRegisterReq> bodyMono = request.bodyToMono(OrderRegisterReq.class);
+        return bodyMono
                 .flatMap(orderMutationPort::registerOrder)
                 .flatMap(order -> ServerResponse.status(201).bodyValue(order))
+                .onErrorResume(WebExchangeBindException.class, this::handleValidationException)
                 .doOnSuccess(res -> log.info("Success Register Order"));
     }
 
@@ -46,6 +53,23 @@ public class OrderHandler {
         return request.bodyToMono(OrderUpdateReq.class)
                 .flatMap(orderMutationPort::updateOrder)
                 .flatMap(order -> ServerResponse.accepted().bodyValue(order))
+                .onErrorResume(WebExchangeBindException.class, this::handleValidationException)
                 .doOnSuccess(res -> log.info("Success Update Order"));
+    }
+
+    // [NUEVO] Método auxiliar para manejar la respuesta de error 400
+    private Mono<ServerResponse> handleValidationException(WebExchangeBindException e) {
+
+        // Convertimos los errores de binding a nuestra estructura ErrorResponse
+        List<ErrorResponse> errors = e.getBindingResult().getAllErrors().stream()
+                .map(error -> ErrorResponse.builder()
+                        .field(error.getObjectName()) // O usa ((FieldError) error).getField()
+                        .message(error.getDefaultMessage())
+                        .build())
+                .toList();
+
+        return ServerResponse.badRequest()
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .bodyValue(errors); // Devuelve la lista de errores como JSON
     }
 }
