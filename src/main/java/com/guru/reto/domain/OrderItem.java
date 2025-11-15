@@ -1,16 +1,26 @@
 package com.guru.reto.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+
+import java.io.Serial;
 import java.io.Serializable;
 
-@Getter
+/**
+ * Entidad de dominio que representa un ítem dentro de una Orden.
+ *
+ * @DynamoDbBean Permite que esta clase sea incrustada como un objeto complejo
+ * dentro de la lista de 'items' en la entidad Order.
+ */
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamoDbBean
 public class OrderItem implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 4648929576102574063L;
 
     private String productId;
     private int quantity;

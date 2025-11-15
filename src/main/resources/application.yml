@@ -2,15 +2,7 @@ spring:
   application:
     name: reto
   main:
-    web-application-type: ${SPRING_MAIN_WEB_APPLICATION_TYPE}
+    web-application-type: ${SPRING_MAIN_WEB_APPLICATION_TYPE:REACTIVE}
   properties:
-    db_table: ${DYNAMODB_TABLE}
-    db_region: ${DYNAMODB_REGION}
-
-
-aws:
-  dynamodb.endpoint-override: http://localhost:8000
-  # Credenciales "dummy" para el cliente local (no las valida)
-  access-key-id: fakeAccessKey
-  secret-access-key: fakeSecretKey
-
+    db_table: ${DYNAMODB_TABLE:orders-table-dev}
+    db_region: ${DYNAMODB_REGION:us-east-1}

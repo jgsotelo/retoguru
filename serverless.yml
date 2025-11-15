@@ -1,7 +1,7 @@
 service: orders-api
 
 # Configuración General del Framework
-frameworkVersion: '3'
+frameworkVersion: '4'
 configValidationMode: error
 
 # Configuración del Proveedor (AWS)
@@ -10,18 +10,16 @@ provider:
   region: us-east-1
   runtime: java17
 
-  # CRÍTICO para Java/Spring
-  snapStart: true
-
   memorySize: 1536
   timeout: 29 # Tiempo de ejecucion
 
   # Variables de Entorno
   environment:
+    MAIN_CLASS: com.guru.reto.RetoApplication.class
     DYNAMODB_TABLE: ${self:custom.tableName}
     DYNAMODB_REGION: ${self:provider.region}
     # Deshabilita el servidor web de Spring Boot, esencial para Lambda
-    SPRING_MAIN_WEB_APPLICATION_TYPE: NONE
+    SPRING_MAIN_WEB_APPLICATION_TYPE: REACTIVE
 
   # Permisos IAM para la Función (Role de ejecución)
   iam:
@@ -45,7 +43,7 @@ provider:
           Resource: "arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/*:*"
 
 package:
-  artifact: target/reto-0.0.1-SNAPSHOT.jar
+  artifact: target/reto-0.0.1-SNAPSHOT-aws.jar
 
 # Definición de Funciones
 functions:

@@ -10,16 +10,22 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
+/**
+ * Configuración de Spring para la conexión con AWS DynamoDB.
+ * Crea los beans necesarios para el cliente asíncrono.
+ */
 @Configuration
 public class DynamoDbConfig {
 
     @Value("${spring.properties.db_table}")
     private String table;
 
-    @Value("${spring.properties.db_table}")
+    @Value("${spring.properties.db_region}")
     private String region;
 
-
+    /**
+     * Crea el cliente base Asíncrono de DynamoDB (SDK v2).
+     */
     @Bean
     public DynamoDbAsyncClient dynamoDbAsyncClient() {
         return  DynamoDbAsyncClient.builder()
@@ -27,6 +33,10 @@ public class DynamoDbConfig {
                 .build();
     }
 
+    /**
+     * Crea el cliente "Mejorado" (Enhanced Client) que permite mapear
+     * POJOs (@DynamoDbBean) directamente.
+     */
     @Bean
     public DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient(DynamoDbAsyncClient asyncClient) {
         return DynamoDbEnhancedAsyncClient.builder()
@@ -34,6 +44,11 @@ public class DynamoDbConfig {
                 .build();
     }
 
+    /**
+     * Crea el Bean de la tabla específica, vinculando el cliente
+     * con el nombre de la tabla y el esquema de la entidad (Order.class).
+     * Este es el Bean que se inyecta en el OrderAdapter.
+     */
     @Bean
     public DynamoDbAsyncTable<Order> orderTable(DynamoDbEnhancedAsyncClient asyncEnhancedClient) {
         return asyncEnhancedClient.table(table, TableSchema.fromBean(Order.class));
