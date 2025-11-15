@@ -3,7 +3,7 @@ name: Despliegue de API Serverless de Pedidos
 on:
   push:
     branches:
-      - feat/crud
+      - main
 
 jobs:
   deploy:
@@ -35,6 +35,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # 5. Instalar Serveless Framework
       - name: Instalar Serverless Framework
         run: npm install -g serverless@4
 
