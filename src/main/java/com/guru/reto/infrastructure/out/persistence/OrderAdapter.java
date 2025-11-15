@@ -17,6 +17,12 @@ import software.amazon.awssdk.enhanced.dynamodb.model.UpdateItemEnhancedRequest;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Adaptador de Salida (Outbound Adapter).
+ * Implementa la interfaz OrderPort y maneja la comunicación directa
+ * con la infraestructura de base de datos (AWS DynamoDB).
+ * Utiliza el cliente Asíncrono Mejorado de DynamoDB.
+ */
 @Slf4j
 @Repository
 @AllArgsConstructor
@@ -24,6 +30,10 @@ public class OrderAdapter implements OrderPort {
 
     private final DynamoDbAsyncTable<Order> orderTable;
 
+    /**
+     * Busca todas las órdenes (limitado a 10) con estado 'REGISTRADO'.
+     * @return Un Flux (reactivo) que emite las órdenes y se colecta en una Lista.
+     */
     public Mono<List<Order>> findAll() {
         return Flux.from(orderTable.scan().items().limit(10)
                         .filter(order -> StringUtils.isNotEmpty(order.getStatus()) && order.getStatus().equals(Constants.STATUS_REGISTRATION)))
@@ -33,6 +43,11 @@ public class OrderAdapter implements OrderPort {
                 .doOnError(err -> log.error("Error OrderAdapter.findAll: {}", err.getMessage()));
     }
 
+    /**
+     * Busca una orden por su Clave de Partición (ID).
+     * @param id El orderId.
+     * @return Un Mono<Order> o Mono.empty() si no se encuentra.
+     */
     public Mono<Order> findId(String id) {
         return Mono.just(id)
                 .map(key -> Key.builder().partitionValue(id).build())
@@ -42,6 +57,11 @@ public class OrderAdapter implements OrderPort {
                 .doOnError(err -> log.error("Error OrderAdapter.findId: {} - {}", id, err.getMessage()));
     }
 
+    /**
+     * Guarda una nueva entidad Order en DynamoDB.
+     * @param order El objeto de dominio a persistir.
+     * @return El objeto guardado (con el estado actualizado).
+     */
     public Mono<Order> create(Order order) {
         return Mono.just(order.toBuilder().status(Constants.STATUS_REGISTRATION).build())
                 .flatMap(body -> Mono.fromCompletionStage(orderTable.putItem(body))
@@ -52,6 +72,12 @@ public class OrderAdapter implements OrderPort {
                 .doOnError(err -> log.error("Error OrderAdapter.create: {} - {}", order.getOrderId(), err.getMessage()));
     }
 
+    /**
+     * Actualiza una orden existente en DynamoDB.
+     * Utiliza un patrón de "leer y luego escribir" (Read-Then-Write) para fusionar campos.
+     * @param order El objeto de dominio con los campos a actualizar.
+     * @return El objeto actualizado.
+     */
     public Mono<Order> update(Order order) {
         return Mono.just(order)
                 .map(body -> Key.builder().partitionValue(body.getOrderId()).build())

@@ -8,6 +8,12 @@ import lombok.Builder;
 
 import java.util.List;
 
+/**
+ * DTO (Data Transfer Object) que representa la solicitud de entrada (Request Body)
+ * para registrar una nueva orden (POST /orders).
+ * * Es un 'record' de Java para inmutabilidad y concisión.
+ * Las anotaciones jakarta.validation son detectadas por WebFluxConfig.
+ */
 @Builder
 public record OrderRegisterReq(
 

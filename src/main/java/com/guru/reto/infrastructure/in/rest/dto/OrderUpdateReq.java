@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+/**
+ * DTO (Data Transfer Object) para la solicitud de actualización (PUT /orders).
+ */
 @Builder
 public record OrderUpdateReq(
 

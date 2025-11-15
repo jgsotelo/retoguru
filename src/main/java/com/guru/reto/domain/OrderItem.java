@@ -6,6 +6,12 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Entidad de dominio que representa un ítem dentro de una Orden.
+ *
+ * @DynamoDbBean Permite que esta clase sea incrustada como un objeto complejo
+ * dentro de la lista de 'items' en la entidad Order.
+ */
 @Data
 @Builder
 @NoArgsConstructor

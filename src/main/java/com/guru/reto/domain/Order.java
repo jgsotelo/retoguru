@@ -13,6 +13,11 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Entidad principal del dominio (Aggregate Root).
+ * Representa la orden de un cliente.
+ * * @DynamoDbBean Habilita el mapeo de esta clase a una tabla de DynamoDB.
+ */
 @Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -44,16 +49,30 @@ public class Order implements Serializable {
     @Getter
     private String status;
 
+    /**
+     * Define el getter para la clave de partición (PK) de DynamoDB.
+     */
     @DynamoDbPartitionKey
     public String getOrderId() {
         return orderId;
     }
 
+    /**
+     * Define el atributo de versión para el bloqueo optimista (concurrencia).
+     * DynamoDB incrementará este número en cada actualización.
+     */
     @DynamoDbVersionAttribute
     public Long getVersion() {
         return version;
     }
 
+    /**
+     * Factory Method (Constructor estático) para crear una Orden desde un DTO de registro.
+     * Mapea el DTO de infraestructura al objeto de dominio.
+     *
+     * @param req El DTO de entrada (OrderRegisterReq).
+     * @return Una nueva entidad Order lista para ser persistida.
+     */
     public static Order fromRegister(final OrderRegisterReq req) {
         return Order.builder()
                 .orderId(Constants.generateId())
@@ -71,6 +90,12 @@ public class Order implements Serializable {
                 .build();
     }
 
+    /**
+     * Factory Method para crear una Orden (parcial) desde un DTO de actualización.
+     *
+     * @param req El DTO de entrada (OrderUpdateReq).
+     * @return Una entidad Order con los campos actualizables.
+     */
     public static Order fromUpdate(final OrderUpdateReq req) {
         return Order.builder()
                 .orderId(req.id())
